@@ -1,6 +1,7 @@
 exports.handleCustomError = (err, req, res, next) => {
     if (err.status) {
-        res.status(err.status).send(err.message);
+        console.log(err);
+        res.status(err.status).send({msg : err.msg});
     } else {
         next(err);
     }
@@ -13,6 +14,7 @@ exports.handlePSQLErrors = (err, req, res, next) => {
         next(err);
     }
 }
+
 
 exports.handleStatus500 = (err,req,res,next) => {
     console.log(err);
