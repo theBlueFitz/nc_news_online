@@ -90,4 +90,6 @@ const seed = (data) => {
   })
   
 };
+
+
 module.exports = seed;
