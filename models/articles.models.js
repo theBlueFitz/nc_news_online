@@ -21,3 +21,14 @@ exports.fetchArticleById = (article_id) => {
             return response.rows;
         })
 }
+
+exports.updateArticleVotesById = async (idToChangeAndVotes) => {
+    const dbOutput = await db.query(
+        `UPDATE articles
+        SET votes =  votes + $2
+        WHERE article_id = $1
+        RETURNING *`,
+        idToChangeAndVotes
+    )
+    return dbOutput.rows[0];
+}
