@@ -12,7 +12,6 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.patchArticleVotesById = (req,res,next) => {
-    console.log('in controller')
     const {article_id} = req.params;
     const {inc_votes} = req.body;
     const idToChangeAndVotes = [article_id,inc_votes]
