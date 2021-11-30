@@ -1,10 +1,9 @@
-const { fetchArticleById, checkArticleExists, updateArticleVotesById } = require("../models/articles.models");
+const { fetchArticleById, checkArticleExists, updateArticleVotesById, fetchArticles } = require("../models/articles.models");
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
     return Promise.all([fetchArticleById(article_id), checkArticleExists(article_id)])
     .then(([article]) => {
-        console.log({article})
         res.status(200).send({article});
     })
     .catch((err) => {
@@ -22,6 +21,14 @@ exports.patchArticleVotesById = (req,res,next) => {
         res.status(200).send({updatedArticle})
     })
     .catch((err) => {
+        next(err);
+    })
+}
+
+exports.getArticles = (req,res,next) => {
+    return fetchArticles().then((articles) => {
+        res.status(200).send({articles});
+    }).catch((err)=>{
         next(err);
     })
 }

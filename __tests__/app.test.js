@@ -143,13 +143,22 @@ describe("PATCH /api/articles/:article_id", () => {
     })
 })
 
-// describe("GET /api/articles", () => {
-//     it("200: responds with an array of article objects default sorted by descending date", () => {
-//         return request(app)
-//         .get("/api/articles")
-//         .expect(200)
-//         .then((response) => {
-//             expect(Array.isArray(response.body)).toBe(true);
-//         })
-//     })
-// })
+describe("GET /api/articles", () => {
+    it("200: responds with an array of article objects", () => {
+        return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+            expect(Array.isArray(response.body.articles)).toBe(true);
+            expect(response.body.articles).toHaveLength(12)
+        })
+    })
+    it("200: responds with an array of article objects default sorted by descending date order", () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then((response) => {
+            expect(response.body.articles).toBeSortedBy('created_at',{descending: true} )
+        })
+    })
+})
