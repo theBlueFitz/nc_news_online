@@ -31,7 +31,7 @@ describe("GET /api/treasures", () => {
 describe("GET /api/articles/:article_id", () => {
     it("200: responds with an object with a specific article and matching article_id", () => {
         return request(app)
-        .get(`/api/articles/4`)
+        .get(`/api/articles/3`)
         .expect(200)
         .then((response) => {
             expect(response.body).toHaveProperty("article");
@@ -39,13 +39,14 @@ describe("GET /api/articles/:article_id", () => {
             expect(response.body.article[0]).toEqual(
                 expect.objectContaining(
                     {
-                        article_id: 4,
-                        title: 'Student SUES Mitch!',
-                        body: 'We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages',
+                        article_id: 3,
+                        title: 'Eight pug gifs that remind me of mitch',
+                        body: 'some gifs',
                         votes: 0,
                         topic: 'mitch',
-                        author: 'rogersop',
-                        created_at: '2020-05-05T23:00:00.000Z'
+                        author: 'icellusedkars',
+                        created_at: "2020-11-03T00:00:00.000Z",
+                        comment_count: "2"
                       }
                 )
             )
@@ -56,8 +57,15 @@ describe("GET /api/articles/:article_id", () => {
         .get('/api/articles/1000000')
         .expect(404)
         .then((response) => {
-            console.log(response.body)
             expect(response.body).toEqual({msg: "No article found for article_id: 1000000"})
         })
     })
+    it("400: responds with invalid request with incorrect input", () => {
+    return request(app)
+        .get('/api/articles/chipmunk')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: "Invalid request"})
+    })
+})
 })
