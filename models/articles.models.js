@@ -33,12 +33,24 @@ exports.updateArticleVotesById = async (idToChangeAndVotes) => {
     return dbOutput.rows[0];
 }
 
-exports.fetchArticles = async () => {
+exports.fetchArticles = async (order) => {
+    if (!order) {
+        const dbOutput = await db.query(
+            `SELECT articles.*, COUNT(comment_id) AS comment_count 
+            FROM articles
+            LEFT JOIN comments ON comments.article_id = articles.article_id
+            GROUP BY articles.article_id
+            ORDER BY articles.created_at DESC;`)
+            return dbOutput.rows;
+    } else if(!['ASC', 'DESC'].includes(order)) {
+        return Promise.reject({status:400, msg:'Invalid order query'})
+    } else {
     const dbOutput = await db.query(
         `SELECT articles.*, COUNT(comment_id) AS comment_count 
         FROM articles
         LEFT JOIN comments ON comments.article_id = articles.article_id
         GROUP BY articles.article_id
-        ORDER BY articles.created_at DESC;`)
+        ORDER BY articles.created_at ${order};`)
         return dbOutput.rows;
+    }
 }

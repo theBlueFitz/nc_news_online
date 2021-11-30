@@ -155,10 +155,26 @@ describe("GET /api/articles", () => {
     })
     it("200: responds with an array of article objects default sorted by descending date order", () => {
         return request(app)
-        .get('/api/articles')
+        .get(`/api/articles`)
         .expect(200)
         .then((response) => {
-            expect(response.body.articles).toBeSortedBy('created_at',{descending: true} )
+            expect(response.body.articles).toBeSortedBy('created_at', {descending:true})
+        })
+    })
+    it("200: responds with an array of article objects sorted by ascending date order if set", () => {
+        return request(app)
+        .get(`/api/articles?order=ASC`)
+        .expect(200)
+        .then((response) => {
+            expect(response.body.articles).toBeSortedBy('created_at')
+        })
+    })
+    it("400: responds with an error of invalid request if order set to anything other than ASC || DESC", () => {
+        return request(app)
+        .get(`/api/articles?order=DROP DATABASE IF EXISTS`)
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: 'Invalid order query'})
         })
     })
 })
