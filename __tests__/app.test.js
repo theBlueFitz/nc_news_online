@@ -7,7 +7,7 @@ const seed  = require('../db/seeds/seed.js');
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
-describe("GET /api/treasures", () => {
+describe("GET /api/topics", () => {
     it("200: returns an array of topic objects" , () => {
         return request(app)
         .get("/api/topics")
@@ -35,8 +35,7 @@ describe("GET /api/articles/:article_id", () => {
         .expect(200)
         .then((response) => {
             expect(response.body).toHaveProperty("article");
-            expect(response.body.article).toHaveLength(1)
-            expect(response.body.article[0]).toEqual(
+            expect(response.body.article).toEqual(
                 expect.objectContaining(
                     {
                         article_id: 3,
@@ -122,7 +121,6 @@ describe("PATCH /api/articles/:article_id", () => {
         .send(voteChange)
         .expect(400)
         .then((response) => {
-            console.log(response)
             expect(response.body).toEqual({msg: "Invalid request"})
         })
     })
@@ -144,3 +142,14 @@ describe("PATCH /api/articles/:article_id", () => {
         })
     })
 })
+
+// describe("GET /api/articles", () => {
+//     it("200: responds with an array of article objects default sorted by descending date", () => {
+//         return request(app)
+//         .get("/api/articles")
+//         .expect(200)
+//         .then((response) => {
+//             expect(Array.isArray(response.body)).toBe(true);
+//         })
+//     })
+// })

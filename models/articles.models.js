@@ -18,7 +18,7 @@ exports.fetchArticleById = (article_id) => {
         WHERE articles.article_id = $1
         GROUP BY articles.article_id;`, [article_id])
         .then((response) => {
-            return response.rows;
+            return response.rows[0];
         })
 }
 
@@ -30,5 +30,6 @@ exports.updateArticleVotesById = async (idToChangeAndVotes) => {
         RETURNING *`,
         idToChangeAndVotes
     )
+    console.log(dbOutput.rows, '<<<<<')
     return dbOutput.rows[0];
 }
