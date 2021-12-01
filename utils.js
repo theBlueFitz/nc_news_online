@@ -1,10 +1,16 @@
-exports.sanitiseOrderQuery = (order) => {
-    if (order === undefined || order === 'DESC') {
-        order = 'DESC';
-        return order;
-    } else if (order === 'ASC') {
-        return order;
-    } else {
-        return Promise.reject({status:400, msg: 'Invalid order query'})
-    }
+exports.setDefaultIfNeeded = (order,sort_by) => {
+   if (order === undefined && sort_by === undefined) {
+       order = 'DESC';
+       sort_by = 'created_at';
+       return [order,sort_by];
+   } else if (order === undefined && sort_by !== undefined) {
+       order = 'DESC';
+       return [order,sort_by];
+   } else if (order !== undefined && sort_by == undefined) {
+       sort_by = 'created_at';
+       return [order,sort_by]
+   }
+   else {
+   return [order,sort_by]
+   }
 }

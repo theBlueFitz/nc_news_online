@@ -177,4 +177,32 @@ describe("GET /api/articles", () => {
             expect(response.body).toEqual({msg: 'Invalid order query'})
         })
     })
+    it('200: responds with an array of article objects as per selected queries when both set', () => {
+        return request(app)
+        .get('/api/articles?order=ASC&sort_by=article_id')
+        .expect(200)
+        .then((response) => {
+            expect(response.body).toBeSortedBy('article_id')
+        })
+    })
+    it('400: responds with an error msg if invalid sort_by query set', () => {
+        return request(app)
+        .get(`/api/articles?order=ASC&sort_by=DROP TABLES`)
+        .expect(400)
+        .then((response) => {
+            console.log(response.body)
+            expect(response.body).toEqual({msg: 'Invalid order query'})
+        })
+    })
+    it('200: responds with an array of article objects filtered by set topic', () => {
+        return request(app)
+        .get('/api/articles?topic=cats')
+        .expect(200)
+        .then((response) => {
+            console.log(response.body)
+            response.body.articles.forEach((article) => {
+                expect(article).toHaveProperty('topic', 'cats')
+            })
+        })
+    })
 })

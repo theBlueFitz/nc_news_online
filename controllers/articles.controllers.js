@@ -1,5 +1,5 @@
-const { fetchArticleById, checkArticleExists, updateArticleVotesById, fetchArticles } = require("../models/articles.models");
-const { sanitiseOrderQuery } = require("../utils");
+const { fetchArticleById, checkArticleExists, updateArticleVotesById, fetchArticles, fetchArticlesFilterByTopic } = require("../models/articles.models");
+const { setDefaultIfNeeded } = require("../utils");
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
@@ -27,12 +27,12 @@ exports.patchArticleVotesById = (req,res,next) => {
 }
 
 exports.getArticles = (req,res,next) => {
-    let {order} = req.query;
-    fetchArticles(order).then((articles) => {
-        res.status(200).send({articles})
-    }).catch((err) => {
-        next(err);
-    })
+    const {order, sort_by, topic} = req.query;
+        fetchArticles(order,sort_by,topic).then((articles) => {
+            res.status(200).send({articles})
+        }).catch((err) => {
+            next(err);
+        })
 }
     
     
