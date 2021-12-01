@@ -26,6 +26,14 @@ describe("GET /api/topics", () => {
            })
         })
     }) 
+    it("400: responds with an error message if bad file path used", () => {
+        return request(app)
+        .get('/apu/hummuna')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: "Path not found"})
+        })
+    })
 })
 
 describe("GET /api/articles/:article_id", () => {
@@ -182,7 +190,7 @@ describe("GET /api/articles", () => {
         .get('/api/articles?order=ASC&sort_by=article_id')
         .expect(200)
         .then((response) => {
-            expect(response.body).toBeSortedBy('article_id')
+            expect(response.body.articles).toBeSortedBy('article_id')
         })
     })
     it('400: responds with an error msg if invalid sort_by query set', () => {
@@ -190,8 +198,7 @@ describe("GET /api/articles", () => {
         .get(`/api/articles?order=ASC&sort_by=DROP TABLES`)
         .expect(400)
         .then((response) => {
-            console.log(response.body)
-            expect(response.body).toEqual({msg: 'Invalid order query'})
+            expect(response.body).toEqual({msg: 'Invalid sort_by query'})
         })
     })
     it('200: responds with an array of article objects filtered by set topic', () => {
@@ -199,10 +206,64 @@ describe("GET /api/articles", () => {
         .get('/api/articles?topic=cats')
         .expect(200)
         .then((response) => {
-            console.log(response.body)
             response.body.articles.forEach((article) => {
                 expect(article).toHaveProperty('topic', 'cats')
             })
+        })
+    })
+    it('204: responds with an error message if topic exists but no articles reference it', () => {
+        return request(app)
+        .get('/api/articles?topic=paper')
+        .expect(204)
+        .then((response) => {
+            expect(response.body).toEqual({})
+            })
+        })
+    it('400: responds with an error message if topic does not exist', () => {
+            return request(app)
+            .get(`/api/articles?topic=DROP TABLES`)
+            .expect(400)
+            .then((response) => {
+                expect(response.body).toEqual({msg: "Invalid topic query"})
+            })
+    })
+})
+
+describe("GET /api/articles/:article_id/comments", () => {
+    it("200: responds with an array of comments", () => {
+        return request(app)
+        .get('/api/articles/9/comments')
+        .expect(200)
+        .then((response) => {
+            expect(response.body.comments).toHaveLength(2)
+            response.body.comments.forEach((comment) => {
+                expect(comment).toEqual(
+                    expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        votes: expect.any(Number),
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String)
+                    })
+                )
+            })
+
+        })
+    })
+    it("204: responds with no content if article exists but no comments connected", () => {
+        return request(app)
+        .get('/api/articles/4/comments')
+        .expect(204)
+        .then((response) => {
+            expect(response.body).toEqual({});
+        })
+    })
+    it('404: responds with an error if article_id does not yet exist', () => {
+        return request(app)
+        .get('/api/articles/150000/comments')
+        .expect(404)
+        .then((response) => {
+            expect(response.body).toEqual({msg: "No article found for article_id: 150000"})
         })
     })
 })

@@ -41,15 +41,14 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic) => 
     if(!['ASC', 'DESC'].includes(order)) {
         return Promise.reject({status:400, msg:'Invalid order query'})
     } else if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'].includes(sort_by)) {
-        return Promise.reject({status:400, msg:'Invalid order query'})
+        return Promise.reject({status:400, msg:'Invalid sort_by query'})
     } else if (!['mitch', 'cats', 'paper', undefined].includes(topic)) {
-        return Promise.reject({status:400, msg:'Invalid order query'})
+        return Promise.reject({status:400, msg:'Invalid topic query'})
     } else if(!topic) {
         
         const queryStr2 = `GROUP BY articles.article_id
         ORDER BY ${sort_by} ${order};`
         const fullQuery = queryStr1.concat(queryStr2)
-        console.log(fullQuery)
     const dbOutput = await db.query(fullQuery)
         return dbOutput.rows;
     } else {
@@ -62,4 +61,10 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic) => 
     }
 }
 
-
+exports.fetchCommentsByArticleId = async (article_id) => {
+    const dbOutput = await db.query(
+        `SELECT comment_id, votes, created_at, author, body
+        FROM comments
+        WHERE article_id = $1;`, [article_id])
+    return dbOutput.rows;
+}

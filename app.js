@@ -9,6 +9,10 @@ app.use(express.json());
 
 app.use("/api", apiRouter);
 
+app.all("/*", (req, res) => {
+    res.status(400).send({msg : 'Path not found'})
+});
+
 app.use(handleCustomError);
 app.use(handlePSQLErrors);
 app.use(handleStatus500);
