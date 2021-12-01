@@ -3,7 +3,6 @@ const format = require("pg-format")
 
 const seed = (data) => {
   const { articleData, commentData, topicData, userData } = data;
-  console.log('Running seed');
   return db
   .query(`DROP TABLE IF EXISTS 
   topics,

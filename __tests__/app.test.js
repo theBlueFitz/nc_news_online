@@ -266,4 +266,38 @@ describe("GET /api/articles/:article_id/comments", () => {
             expect(response.body).toEqual({msg: "No article found for article_id: 150000"})
         })
     })
+    it('400: responds with an error if article_id is invalid data type', () => {
+        return request(app)
+        .get(`/api/articles/DROP TABLES/comments`)
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: "Invalid request"})
+        })
+    })
+})
+
+describe("POST api/articles/:article_id/comments", () => {
+    it('201: adds new comment to the article and responds with comment', () => {
+        const newComment = {
+            username: 'lurker',
+            body: 'Oh dear, looks like I need to change my username' 
+        }
+        return request(app)
+        .post('/api/articles/8/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response) => {
+            console.log(response.body)
+            expect(response.body.newComment).toEqual(
+                expect.objectContaining({
+                    article_id: 8,
+                    author: "lurker",
+                    body: 'Oh dear, looks like I need to change my username',
+                    comment_id: expect.any(Number),
+                    created_at: expect.any(String),
+                    votes: 0
+                })
+            );
+        })
+    })
 })

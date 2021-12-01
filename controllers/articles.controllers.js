@@ -1,4 +1,4 @@
-const { fetchArticleById, checkArticleExists, updateArticleVotesById, fetchArticles, fetchArticlesFilterByTopic, fetchCommentsByArticleId } = require("../models/articles.models");
+const { fetchArticleById, checkArticleExists, updateArticleVotesById, fetchArticles, fetchArticlesFilterByTopic, fetchCommentsByArticleId, addCommentByArticleId } = require("../models/articles.models");
 const { setDefaultIfNeeded } = require("../utils");
 
 exports.getArticleById = (req, res, next) => {
@@ -41,8 +41,9 @@ exports.getArticles = (req,res,next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const {article_id} = req.params;
-    return Promise.all([fetchCommentsByArticleId(article_id), checkArticleExists(article_id)]) .then(([comments]) => {
-        if (comments.length === 0){
+    return Promise.all([fetchCommentsByArticleId(article_id), checkArticleExists(article_id)]) 
+    .then(([comments]) => {
+        if (comments.length === 0) {
             res.status(204).send()
         } else {
         res.status(200).send({comments})
@@ -50,8 +51,16 @@ exports.getCommentsByArticleId = (req, res, next) => {
     }).catch((err) => {
         next(err);
     })
-
 }
     
-    
+exports.postCommentByArticleId = (req,res,next) => {
+    const {article_id} = req.params;
+    const {username, body} = req.body;
+    addCommentByArticleId(article_id, username, body)
+    .then((newComment) => {
+        res.status(201).send({newComment})
+    }).catch((err) => {
+        next(err);
+    })
+}  
     
