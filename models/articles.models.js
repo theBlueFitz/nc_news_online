@@ -70,7 +70,6 @@ exports.fetchCommentsByArticleId = async (article_id) => {
 }
 
 exports.addCommentByArticleId = async (article_id, username, body) => {
-    console.log(body.length)
     if (body.length === 0) {
         return Promise.reject({status:400, msg: 'Comment body required'})
     } else {

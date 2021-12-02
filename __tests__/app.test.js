@@ -330,7 +330,6 @@ describe("POST api/articles/:article_id/comments", () => {
             comment_id: 1,
             username: 'lurker',
             body: 'Oh dear, looks like I need to change my username', 
-            article_id: 5,
             votes: 1000000,
             created_at: 'Ha ha jokes on you'
         }
@@ -339,7 +338,7 @@ describe("POST api/articles/:article_id/comments", () => {
         .send(newComment)
         .expect(404)
         .then((response) => {
-            expect(response.body).toEqual({msg: `No article found for article_id: 100000`})
+            expect(response.body).toEqual({msg: `Does not exist`})
         })
     })
     it('400: will not allow client to use bad file path', () => {
@@ -374,6 +373,33 @@ describe("POST api/articles/:article_id/comments", () => {
         .expect(400)
         .then((response) => {
             expect(response.body).toEqual({msg: 'Comment body required'})
+        })
+    })
+})
+
+describe.only("DELETE /api/comments/:comment_id", () => {
+    it("204: deletes a comment with corresponding comment_id", () => {
+        return request(app)
+        .delete('/api/comments/7')
+        .expect(204)
+        .then((nilpoint) => {
+            expect(nilpoint.body).toEqual({});
+        })
+    })
+    it("404: responds with an error message if comment doesn't exist", () => {
+        return request(app)
+        .delete('/api/comments/100000')
+        .expect(404)
+        .then((response) => {
+            expect(response.body).toEqual({msg: "No comment found for comment_id: 100000"})
+        })
+    })
+    it("400: responds with an error message if invalid data type for comment_id", () => {
+        return request(app)
+        .delete('/api/comments/DROP TABLES')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: "Invalid request"})
         })
     })
 })
