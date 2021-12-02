@@ -56,8 +56,8 @@ exports.getCommentsByArticleId = (req, res, next) => {
 exports.postCommentByArticleId = (req,res,next) => {
     const {article_id} = req.params;
     const {username, body} = req.body;
-    addCommentByArticleId(article_id, username, body)
-    .then((commentPosted) => {
+    return Promise.all([checkArticleExists(article_id), addCommentByArticleId(article_id, username, body)])
+    .then(([check, commentPosted]) => {
         res.status(201).send({commentPosted})
     }).catch((err) => {
         next(err);

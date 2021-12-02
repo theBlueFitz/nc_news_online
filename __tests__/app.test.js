@@ -287,8 +287,7 @@ describe("POST api/articles/:article_id/comments", () => {
         .send(newComment)
         .expect(201)
         .then((response) => {
-            console.log(response.body)
-            expect(response.body.newComment).toEqual(
+            expect(response.body.commentPosted).toEqual(
                 expect.objectContaining({
                     article_id: 8,
                     author: "lurker",
@@ -298,6 +297,83 @@ describe("POST api/articles/:article_id/comments", () => {
                     votes: 0
                 })
             );
+        })
+    })
+    it('201: only allows client to set username and body', () => {
+        const newComment = {
+            comment_id: 1,
+            username: 'lurker',
+            body: 'Oh dear, looks like I need to change my username', 
+            article_id: 5,
+            votes: 1000000,
+            created_at: 'Ha ha jokes on you'
+        }
+        return request(app)
+        .post('/api/articles/8/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response) => {
+            expect(response.body.commentPosted).toEqual(
+                expect.objectContaining({
+                    article_id: 8,
+                    author: "lurker",
+                    body: 'Oh dear, looks like I need to change my username',
+                    comment_id: expect.any(Number),
+                    created_at: expect.any(String),
+                    votes: 0
+                })
+            );
+        })
+    })
+    it('404: will not allow client to comment on article that doesn"t exist', () => {
+        const newComment = {
+            comment_id: 1,
+            username: 'lurker',
+            body: 'Oh dear, looks like I need to change my username', 
+            article_id: 5,
+            votes: 1000000,
+            created_at: 'Ha ha jokes on you'
+        }
+        return request(app)
+        .post('/api/articles/100000/comments')
+        .send(newComment)
+        .expect(404)
+        .then((response) => {
+            expect(response.body).toEqual({msg: `No article found for article_id: 100000`})
+        })
+    })
+    it('400: will not allow client to use bad file path', () => {
+        const newComment = {
+            comment_id: 1,
+            username: 'lurker',
+            body: 'Oh dear, looks like I need to change my username', 
+            article_id: 5,
+            votes: 1000000,
+            created_at: 'Ha ha jokes on you'
+        }
+        return request(app)
+        .post('/api/articles/potato/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: "Invalid request"})
+        })
+    })
+    it('400: will not allow client to post blank comment', () => {
+        const newComment = {
+            comment_id: 1,
+            username: 'lurker',
+            body: '', 
+            article_id: 5,
+            votes: 1000000,
+            created_at: 'Ha ha jokes on you'
+        }
+        return request(app)
+        .post('/api/articles/8/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: 'Comment body required'})
         })
     })
 })

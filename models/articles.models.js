@@ -70,6 +70,10 @@ exports.fetchCommentsByArticleId = async (article_id) => {
 }
 
 exports.addCommentByArticleId = async (article_id, username, body) => {
+    console.log(body.length)
+    if (body.length === 0) {
+        return Promise.reject({status:400, msg: 'Comment body required'})
+    } else {
     const dbOutput = await db.query(
         `INSERT INTO comments (author, article_id,body)
         VALUES ($1, $2, $3)
@@ -77,4 +81,5 @@ exports.addCommentByArticleId = async (article_id, username, body) => {
         [username, article_id, body]
     )
     return dbOutput.rows[0];
+    }
 }
