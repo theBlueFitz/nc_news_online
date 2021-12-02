@@ -377,7 +377,7 @@ describe("POST api/articles/:article_id/comments", () => {
     })
 })
 
-describe.only("DELETE /api/comments/:comment_id", () => {
+describe("DELETE /api/comments/:comment_id", () => {
     it("204: deletes a comment with corresponding comment_id", () => {
         return request(app)
         .delete('/api/comments/7')
@@ -401,5 +401,133 @@ describe.only("DELETE /api/comments/:comment_id", () => {
         .then((response) => {
             expect(response.body).toEqual({msg: "Invalid request"})
         })
+    })
+})
+
+describe("GET /api", () => {
+    it("200: responds with a JSON object of all possible endpoints", () => {
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then((response) => {
+            expect(response.body).toEqual(
+                expect.objectContaining({
+                    "GET /api": {
+                      "description": "serves up a json representation of all the available endpoints of the api"
+                    },
+                    "GET /api/topics": {
+                      "description": "serves an array of all topics",
+                      "queries": [],
+                      "exampleResponse": {
+                        "topics": [{ "slug": "football", "description": "Footie!" }]
+                      }
+                    },
+                    "GET /api/articles": {
+                      "description": "serves an array of all topics",
+                      "queries": ["author", "topic", "sort_by", "order"],
+                      "exampleResponse": {
+                        "articles": [
+                          {
+                            "title": "Seafood substitutions are increasing",
+                            "topic": "cooking",
+                            "author": "weegembump",
+                            "body": "Text from the article..",
+                            "created_at": 1527695953341
+                          }
+                        ]
+                      }
+                    },
+                    "GET /api/comments" : {
+                      "description": "serves an array of all comments",
+                      "queries": [],
+                      "exampleResponse": {
+                        "comments": 
+                           [
+                            {
+                              "body": "Superficially charming",
+                              "votes": 0,
+                              "author": "icellusedkars",
+                              "article_id": 1,
+                              "created_at": "new Date(1577848080000)"
+                            }
+                          ] 
+                      }
+                    },
+                    "GET /api/articles/:article_id" : {
+                      "description": "serves an object with a single article selected by id",
+                      "queries" : [],
+                      "exampleResponse": {
+                        "article": {
+                          "title": "Sony Vaio; or, The Laptop",
+                          "topic": "mitch",
+                          "author": "icellusedkars",
+                          "body": "Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.",
+                          "created_at": "new Date(1602828180000)",
+                          "votes": 0
+                        }
+                      }
+                    },
+                    "PATCH /api/articles/:article_id" : {
+                      "description" : "Increments or decrements article votes returning the article with new vote count",
+                      "examplePatch" : { "inc_votes" : 1 },
+                      "exampleResponse": {
+                        "updatedArticle": {
+                          "title": "Sony Vaio; or, The Laptop",
+                          "topic": "mitch",
+                          "author": "icellusedkars",
+                          "body": "Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.",
+                          "created_at": "new Date(1602828180000)",
+                          "votes": 0
+                        }
+                      }
+                    },
+                    "GET /api/articles/:article_id/comments" : {
+                      "description" : "Responds with an array of comments corresponding to an article ID",
+                      "queries": [],
+                      "exampleResponse": {
+                        "comments": [
+                          {
+                            "comment_id": 1,
+                            "votes": 16,
+                            "created_at": "2020-04-05T23:00:00.000Z",
+                            "author": "butter_bridge",
+                            "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+                          },
+                          {
+                            "comment_id": 17,
+                            "votes": 20,
+                            "created_at": "2020-03-14T00:00:00.000Z",
+                            "author": "icellusedkars",
+                            "body": "The owls are not what they seem."
+                          }
+                        ]
+                      }
+                    },
+                    "POST /api/articles/:article_id/comments" : {
+                      "description": "posts a new comment on article with corresponding article_id",
+                      "queries": [],
+                      "examplePost": {
+                        "username": "lurker",
+                        "body": "Oh dear, looks like I need to change my username" 
+                        },
+                        "example response": {
+                          "commentPosted" : [
+                            {
+                              "comment_id": 7,
+                              "author": "icellusedkars",
+                              "article_id": 1,
+                              "votes": 0,
+                              "created_at": "2020-05-14T23:00:00.000Z",
+                              "body": "Lobster pot"
+                            }
+                          ]
+                        }
+                    },
+                    "DELETE /api/comments/:comment_id" : {
+                      "description": "deletes a comment with specified id"
+                    }
+                  })
+            )
+            })
     })
 })

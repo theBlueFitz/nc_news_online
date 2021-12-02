@@ -23,3 +23,10 @@ exports.removeCommentById = async (comment_id) => {
     )
     return dbOutput;
 }
+
+exports.fetchComments = async () => {
+    const dbOutput = await db.query(
+        `SELECT * FROM comments`
+    )
+    return dbOutput.rows;
+}
