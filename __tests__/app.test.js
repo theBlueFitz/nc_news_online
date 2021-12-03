@@ -531,3 +531,30 @@ describe("GET /api", () => {
             })
     })
 })
+
+describe.only("GET api/users", () => {
+    it("200: responds with an array of users", () => {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response) => {
+            const users = response.body.users
+            expect(users).toHaveLength(4)
+            users.forEach((user) => {
+                expect(user).toEqual(
+                    expect.objectContaining({
+                        username: expect.any(String)
+                    })
+                )
+            })
+        })
+    })
+    it("400: responds with an error message if bad urlpath used", () => {
+        return request(app)
+        .get('/api/yousers')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: "Path not found"})
+        })
+    })
+})
