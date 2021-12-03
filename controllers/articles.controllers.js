@@ -27,7 +27,7 @@ exports.patchArticleVotesById = (req,res,next) => {
 }
 
 exports.getArticles = (req,res,next) => {
-    const {order, sort_by, topic, limit,p} = req.query;
+    const {order, sort_by, topic, limit, p} = req.query;
         return Promise.all([fetchArticles(order,sort_by,topic,limit,p),fetchAllArticles(order,sort_by,topic),checkTopicExists(topic)])
         .then(([articles, total_count]) => {
             res.status(200).send({articles: articles, total_count: total_count})
@@ -38,7 +38,8 @@ exports.getArticles = (req,res,next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const {article_id} = req.params;
-    return Promise.all([fetchCommentsByArticleId(article_id), checkArticleExists(article_id)]) 
+    const {limit, p} = req.query;
+    return Promise.all([fetchCommentsByArticleId(article_id,limit,p), checkArticleExists(article_id)]) 
     .then(([comments]) => {
         res.status(200).send({comments})
     }).catch((err) => {

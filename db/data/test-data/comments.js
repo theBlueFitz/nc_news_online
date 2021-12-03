@@ -125,4 +125,11 @@ module.exports = [
     article_id: 1,
     created_at: new Date(1595294400000),
   },
+  {
+    body: "This morning, I had coco pops for breakfast.",
+    votes: 2,
+    author: "butter_bridge",
+    article_id: 1,
+    created_at: new Date(1595294400000),
+  }
 ];

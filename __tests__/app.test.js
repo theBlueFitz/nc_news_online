@@ -288,7 +288,6 @@ describe.only("GET /api/articles", () => {
         .get('/api/articles?p=3')
         .expect(200)
         .then((response) => {
-            console.log(response)
             expect(response.body.articles).toHaveLength(9);
             expect(response.body.total_count).toBe(12);
         })
@@ -375,6 +374,78 @@ describe("GET /api/articles/:article_id/comments", () => {
         .expect(400)
         .then((response) => {
             expect(response.body).toEqual({msg: "Invalid request"})
+        })
+    })
+    it('200: responds with an array of comments limited to 10 by default', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then((response) => {
+            expect(response.body.comments).toHaveLength(10);
+        })
+    })
+    it('200: responds with an array of comments corresponding to limit setting', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=3')
+        .expect(200)
+        .then((response) => {
+            expect(response.body.comments).toHaveLength(3);
+        })
+    })
+    it('400: responds with an error message if limit is a negative number', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=-3')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid limit query'});
+        })
+    })
+    it('400: responds with an error message if limit is 0', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=0')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid limit query'});
+        })
+    })
+    it('400: responds with an error message if limit is a float', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=4.5')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid limit query'});
+        })
+    })
+    it('400: responds with an error message if limit is an invalid data type', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=3 DROP 45 TABLES')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid limit query'});
+        })
+    })
+    it('200: responds with an array of comments offset by page setting', () => {
+        return request(app)
+        .get('/api/articles/1/comments?p=4')
+        .expect(200)
+        .then((response) => {
+            expect(response.body.comments).toHaveLength(8);
+        })
+    })
+    it('400: responds with an error message if p is invalid data type', () => {
+        return request(app)
+        .get('/api/articles/1/comments?p=DROP TABLES')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid page query'});
+        })
+    })
+    it('400: responds with an error message if p > limit', () => {
+        return request(app)
+        .get('/api/articles/1/comments?p=5&limit=3')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid page query'});
         })
     })
 })

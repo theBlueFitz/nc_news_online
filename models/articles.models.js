@@ -42,8 +42,9 @@ exports.updateArticleVotesById = async (idToChangeAndVotes) => {
     }
 }
 
-exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limit = '10', p = '1') => {
+exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limit = '10', p = '0') => {
     const regex = /^[1-9]+\d*$(?!\D)/gi;
+    const regex2 = /^\d+$(?!\D)/gi;
     const queryStr1 = `SELECT articles.*, COUNT(comment_id) AS comment_count
         FROM articles
         LEFT JOIN comments ON comments.article_id = articles.article_id `
@@ -53,7 +54,7 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
         return Promise.reject({status:400, msg:'Invalid sort_by query'})
     } else if (!limit.match(regex)) {
         return Promise.reject({status:400, msg:'Invalid limit query'})
-    } else if (!p.match(regex) || parseInt(p) > parseInt(limit)) {
+    } else if (!p.match(regex2) || parseInt(p) > parseInt(limit)) {
         return Promise.reject({status: 400, msg: 'Invalid page query'})
     }
     else if(!topic) {
@@ -63,7 +64,6 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
         LIMIT ${limit} OFFSET ${p};`
         const fullQuery = queryStr1.concat(queryStr2)
     const dbOutput = await db.query(fullQuery)
-    console.log(dbOutput.rows)
         return dbOutput.rows;
     } else {
         const queryStr2 = `WHERE topic = $1
@@ -77,12 +77,21 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
     }
 }
 
-exports.fetchCommentsByArticleId = async (article_id) => {
+exports.fetchCommentsByArticleId = async (article_id,limit = '10',p= '0') => {
+    const regex = /^[1-9]+\d*$(?!\D)/gi;
+    const regex2 = /^\d+$(?!\D)/gi;
+    if (!limit.match(regex)) {
+        return Promise.reject({status:400, msg:'Invalid limit query'})
+    } else if (!p.match(regex2) || parseInt(p) > parseInt(limit)) {
+        return Promise.reject({status: 400, msg: 'Invalid page query'})
+    } else {
     const dbOutput = await db.query(
         `SELECT comment_id, votes, created_at, author, body
         FROM comments
-        WHERE article_id = $1;`, [article_id])
+        WHERE article_id = $1
+        LIMIT ${limit} OFFSET ${p};`, [article_id])
     return dbOutput.rows;
+    }
 }
 
 exports.addCommentByArticleId = async (article_id, username, body) => {
