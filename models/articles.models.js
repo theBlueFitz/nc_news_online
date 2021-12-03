@@ -42,7 +42,7 @@ exports.updateArticleVotesById = async (idToChangeAndVotes) => {
     }
 }
 
-exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limit = '10') => {
+exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limit = '10', p = '1') => {
     const regex = /^[1-9]+\d*$(?!\D)/gi;
     const queryStr1 = `SELECT articles.*, COUNT(comment_id) AS comment_count
         FROM articles
@@ -53,21 +53,23 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
         return Promise.reject({status:400, msg:'Invalid sort_by query'})
     } else if (!limit.match(regex)) {
         return Promise.reject({status:400, msg:'Invalid limit query'})
-    
-    } else if(!topic) {
+    } else if (!p.match(regex) || parseInt(p) > parseInt(limit)) {
+        return Promise.reject({status: 400, msg: 'Invalid page query'})
+    }
+    else if(!topic) {
         
         const queryStr2 = `GROUP BY articles.article_id
         ORDER BY ${sort_by} ${order}
-        LIMIT ${limit};`
-        console.log(limit)
+        LIMIT ${limit} OFFSET ${p};`
         const fullQuery = queryStr1.concat(queryStr2)
     const dbOutput = await db.query(fullQuery)
+    console.log(dbOutput.rows)
         return dbOutput.rows;
     } else {
         const queryStr2 = `WHERE topic = $1
         GROUP BY articles.article_id
         ORDER BY ${sort_by} ${order}
-        LIMIT ${limit};`
+        LIMIT ${limit} OFFSET ${p};`
         
         const fullQuery = queryStr1.concat(queryStr2)
         const dbOutput = await db.query(fullQuery, [topic])

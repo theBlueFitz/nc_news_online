@@ -258,7 +258,6 @@ describe.only("GET /api/articles", () => {
             expect(response.body.articles).toHaveLength(3);
             expect(response.body.total_count).toBe(12);
         })
-
     })
     it("400: responds with an error message if invalid data type for limit query", () => {
         return request(app)
@@ -274,6 +273,61 @@ describe.only("GET /api/articles", () => {
         .expect(400)
         .then((response) => {
             expect(response.body).toEqual({msg : 'Invalid limit query'})
+        })
+    })
+    it("400: responds with an error message if client tries to set limit to float", () => {
+        return request(app)
+        .get('/api/articles?limit=3.5')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid limit query'})
+        })
+    })
+    it("200: accepts a p query and responds with an array of articles starting at p, total count is unaffected", () => {
+        return request(app)
+        .get('/api/articles?p=3')
+        .expect(200)
+        .then((response) => {
+            console.log(response)
+            expect(response.body.articles).toHaveLength(9);
+            expect(response.body.total_count).toBe(12);
+        })
+    })
+    it("400: responds with an error message if client tries to set p > limit", () => {
+        return request(app)
+        .get('/api/articles?p=15')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid page query'})
+        })
+    })
+    it("400: responds with an error message if client tries to set p to NaN", () => {
+        return request(app)
+        .get('/api/articles?p=kumquat')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid page query'})
+        })
+    })
+    it("200: responds with an array of articles when all possible queries set", () => {
+        return request(app)
+        .get('/api/articles?limit=8&p=3&order=ASC&sort_by=article_id&topic=mitch')
+        .expect(200)
+        .then((response) => {
+            expect(response.body.articles).toHaveLength(8);
+            expect(response.body.total_count).toBe(11);
+            expect(response.body.articles).toBeSortedBy('article_id');
+            expect(response.body.articles[0]).toEqual(
+                expect.objectContaining({
+                    article_id: 4,
+                    title: 'Student SUES Mitch!',
+                    topic: 'mitch',
+                    author: 'rogersop',
+                    body: 'We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages',
+                    created_at:  "2020-05-05T23:00:00.000Z",
+                    votes: 0
+                  })
+            )
         })
     })
 })
