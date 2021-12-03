@@ -8,7 +8,7 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("GET /api/topics", () => {
-    it("200: returns an array of topic objects" , () => {
+    it("200: responds with an array of topic objects" , () => {
         return request(app)
         .get("/api/topics")
         .expect(200)
@@ -78,15 +78,15 @@ describe("GET /api/articles/:article_id", () => {
 })
 
 describe("PATCH /api/articles/:article_id", () => {
-    it("200: increments votes as set by inc_votes, returning updated article", () => {
+    it("200: increments votes as set by inc_votes, responding with an updated article", () => {
         let newVote = 5;
         const voteChange = {inc_votes : newVote}
         return request(app)
         .patch('/api/articles/2')
         .send(voteChange)
         .then((response) => {
-            const {updatedArticle} = response.body
-            expect(updatedArticle).toEqual(
+            const {article} = response.body
+            expect(article).toEqual(
                 expect.objectContaining({
                     article_id: 2,
                     title: 'Sony Vaio; or, The Laptop',
@@ -99,7 +99,7 @@ describe("PATCH /api/articles/:article_id", () => {
             )
         })
     })
-    it("200: decrements votes as set by inc_votes, returning updated article", () => {
+    it("200: decrements votes as set by inc_votes, responding with updated article", () => {
         let newVote = -42;
         const voteChange = {inc_votes : newVote}
         return request(app)
@@ -107,8 +107,8 @@ describe("PATCH /api/articles/:article_id", () => {
         .send(voteChange)
         .expect(200)
         .then((response) => {
-            const {updatedArticle} = response.body
-            expect(updatedArticle).toEqual(
+            const {article} = response.body
+            expect(article).toEqual(
                 expect.objectContaining({
                     article_id: 2,
                     title: 'Sony Vaio; or, The Laptop',
@@ -117,6 +117,28 @@ describe("PATCH /api/articles/:article_id", () => {
                     body: 'Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.',
                     created_at: "2020-10-15T23:00:00.000Z",
                     votes: -42
+                })
+            )
+        })
+    })
+    it("200: responds with an unchanged article if inc_votes key is missing", () => {
+        let newVote = -42;
+        const voteChange = {}
+        return request(app)
+        .patch('/api/articles/2')
+        .send(voteChange)
+        .expect(200)
+        .then((response) => {
+            const {article} = response.body
+            expect(article).toEqual(
+                expect.objectContaining({
+                    article_id: 2,
+                    title: 'Sony Vaio; or, The Laptop',
+                    topic: 'mitch',
+                    author: 'icellusedkars',
+                    body: 'Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.',
+                    created_at: "2020-10-15T23:00:00.000Z",
+                    votes: 0
                 })
             )
         })
@@ -211,20 +233,20 @@ describe("GET /api/articles", () => {
             })
         })
     })
-    it('204: responds with an error message if topic exists but no articles reference it', () => {
+    it('200: responds with an empty array if topic exists but no articles reference it', () => {
         return request(app)
         .get('/api/articles?topic=paper')
-        .expect(204)
+        .expect(200)
         .then((response) => {
-            expect(response.body).toEqual({})
+            expect(response.body).toEqual({articles: []})
             })
         })
-    it('400: responds with an error message if topic does not exist', () => {
+    it('404: responds with an error message if topic does not exist', () => {
             return request(app)
             .get(`/api/articles?topic=DROP TABLES`)
-            .expect(400)
+            .expect(404)
             .then((response) => {
-                expect(response.body).toEqual({msg: "Invalid topic query"})
+                expect(response.body).toEqual({msg: "No topic found for topic: DROP TABLES"})
             })
     })
 })
@@ -250,12 +272,12 @@ describe("GET /api/articles/:article_id/comments", () => {
 
         })
     })
-    it("204: responds with no content if article exists but no comments connected", () => {
+    it("200: responds with an empty array if article exists but no comments connected", () => {
         return request(app)
         .get('/api/articles/4/comments')
-        .expect(204)
+        .expect(200)
         .then((response) => {
-            expect(response.body).toEqual({});
+            expect(response.body).toEqual({comments: []});
         })
     })
     it('404: responds with an error if article_id does not yet exist', () => {
@@ -287,14 +309,11 @@ describe("POST api/articles/:article_id/comments", () => {
         .send(newComment)
         .expect(201)
         .then((response) => {
-            expect(response.body.commentPosted).toEqual(
+            expect(response.body).toEqual(
                 expect.objectContaining({
-                    article_id: 8,
-                    author: "lurker",
-                    body: 'Oh dear, looks like I need to change my username',
-                    comment_id: expect.any(Number),
-                    created_at: expect.any(String),
-                    votes: 0
+                    
+                    comment: 'Oh dear, looks like I need to change my username',
+                    
                 })
             );
         })
@@ -313,14 +332,9 @@ describe("POST api/articles/:article_id/comments", () => {
         .send(newComment)
         .expect(201)
         .then((response) => {
-            expect(response.body.commentPosted).toEqual(
+            expect(response.body).toEqual(
                 expect.objectContaining({
-                    article_id: 8,
-                    author: "lurker",
-                    body: 'Oh dear, looks like I need to change my username',
-                    comment_id: expect.any(Number),
-                    created_at: expect.any(String),
-                    votes: 0
+                    comment: 'Oh dear, looks like I need to change my username'
                 })
             );
         })
@@ -373,6 +387,18 @@ describe("POST api/articles/:article_id/comments", () => {
         .expect(400)
         .then((response) => {
             expect(response.body).toEqual({msg: 'Comment body required'})
+        })
+    })
+    it("400: responds with an error message if missing required post fields", () => {
+        const newComment = {
+            body: 'test test test'
+        }
+        return request(app)
+        .post('/api/articles/8/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: 'Invalid criteria'})
         })
     })
 })
@@ -532,7 +558,7 @@ describe("GET /api", () => {
     })
 })
 
-describe.only("GET api/users", () => {
+describe("GET api/users", () => {
     it("200: responds with an array of users", () => {
         return request(app)
         .get('/api/users')
@@ -555,6 +581,22 @@ describe.only("GET api/users", () => {
         .expect(400)
         .then((response) => {
             expect(response.body).toEqual({msg: "Path not found"})
+        })
+    })
+})
+
+describe.only("GET /api/users/:username", () => {
+    it("200: responds with a user object", () => {
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+        .then((response) => {
+            expect(response.body).toEqual({user: {
+                username: 'butter_bridge',
+                name: 'jonny',
+                avatar_url:
+                  'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+              }})
         })
     })
 })

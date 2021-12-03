@@ -22,6 +22,14 @@ exports.handlePSQLErrors2 = (err, req, res, next) => {
     }
 }
 
+exports.handlePSQLErrors3 = (err,req,res,next) => {
+    if (err.code === '23502') {
+        res.status(400).send({msg :'Invalid criteria'})
+    } else {
+        next(err)
+    }
+}
+
 
 exports.handleStatus500 = (err,req,res,next) => {
     console.log(err);

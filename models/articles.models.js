@@ -24,6 +24,13 @@ exports.fetchArticleById = (article_id) => {
 }
 
 exports.updateArticleVotesById = async (idToChangeAndVotes) => {
+    const [article_id] = idToChangeAndVotes;
+    if (!idToChangeAndVotes[1]) {
+        const dbOutput = await db.query(`
+        SELECT * FROM articles
+        WHERE article_id = $1`, [article_id])
+        return dbOutput.rows[0]
+    } else {
     const dbOutput = await db.query(
         `UPDATE articles
         SET votes =  votes + $2
@@ -32,6 +39,7 @@ exports.updateArticleVotesById = async (idToChangeAndVotes) => {
         idToChangeAndVotes
     )
     return dbOutput.rows[0];
+    }
 }
 
 exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic) => {
@@ -42,8 +50,6 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic) => 
         return Promise.reject({status:400, msg:'Invalid order query'})
     } else if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'].includes(sort_by)) {
         return Promise.reject({status:400, msg:'Invalid sort_by query'})
-    } else if (!['mitch', 'cats', 'paper', undefined].includes(topic)) {
-        return Promise.reject({status:400, msg:'Invalid topic query'})
     } else if(!topic) {
         
         const queryStr2 = `GROUP BY articles.article_id
@@ -81,4 +87,20 @@ exports.addCommentByArticleId = async (article_id, username, body) => {
     )
     return dbOutput.rows[0];
     }
+}
+
+exports.checkTopicExists = async (topic) => {
+    if (!topic) {
+        const dbOutput = await db.query(`
+        SELECT * FROM topics`)
+        return dbOutput
+    }
+    const dbOutput = await db.query(`
+    SELECT * FROM topics
+    WHERE slug = $1`, [topic])
+    if (!dbOutput.rows[0]) 
+    return Promise.reject({
+        status: 404,
+        msg: `No topic found for topic: ${topic}`
+    })
 }

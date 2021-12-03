@@ -1,5 +1,5 @@
 const express = require('express');
-const { handleCustomError, handlePSQLErrors1, handleStatus500, handlePSQLErrors2 } = require('./controllers/error.controllers');
+const { handleCustomError, handlePSQLErrors1, handleStatus500, handlePSQLErrors2, handlePSQLErrors3 } = require('./controllers/error.controllers');
 const apiRouter = require("./routers/api.routers");
 
 
@@ -16,6 +16,7 @@ app.all("/*", (req, res) => {
 app.use(handleCustomError);
 app.use(handlePSQLErrors1);
 app.use(handlePSQLErrors2);
+app.use(handlePSQLErrors3);
 app.use(handleStatus500);
 
 module.exports = app;

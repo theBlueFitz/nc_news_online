@@ -5,14 +5,9 @@ const { checkCommentExists, removeCommentById, fetchComments } = require("../mod
 
 exports.deleteCommentByCommentId = (req,res,next) => {
     const {comment_id} = req.params;
-    checkCommentExists(comment_id)
-    .then((comment_id) => {
-        removeCommentById(comment_id)
-        .then((comment) => {
-            res.status(204).send()
-        }).catch((err) => {
-            next(err);
-        })
+    removeCommentById(comment_id)
+    .then((comment) => {
+        res.status(204).send()
     }).catch((err) => {
         next(err)
     })

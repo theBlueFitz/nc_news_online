@@ -73,15 +73,6 @@ NOTE: Minimum required versions of Node.js = v17.1.0, Postgres = v8.7.1
 
 ### Further Routes
 
-#### **GET /api/users**
-
-Responds with:
-
-- an array of objects, each object should have the following property:
-  - `username`
-
----
-
 #### **GET /api/users/:username**
 
 Responds with:
