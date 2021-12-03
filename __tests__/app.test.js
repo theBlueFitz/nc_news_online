@@ -610,7 +610,7 @@ describe("GET /api/users/:username", () => {
     })
 })
 
-describe.only("PATCH /api/comments/:comment_id", () => {
+describe("PATCH /api/comments/:comment_id", () => {
     it("200: increments comment votes by set votes", () => {
         const newVotes = 200
         const voteChange = {inc_votes : newVotes}
@@ -654,5 +654,60 @@ describe.only("PATCH /api/comments/:comment_id", () => {
                   }})
             )
         })
+    })
+    it("200: comment is unaffected if inc_votes is missing", () => {
+        const newVotes = -200
+        const voteChange = {money:5000000}
+        return request(app)
+        .patch("/api/comments/5")
+        .send(voteChange)
+        .expect(200)
+        .then((response) => {
+            expect(response.body).toEqual(
+                expect.objectContaining( {comment :
+                    {
+                    article_id: 1,
+                    comment_id: 5,
+                    body: "I hate streaming noses",
+                    votes: 0,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    created_at: "2020-11-03T00:00:00.000Z",
+                  }})
+            )
+        })
+    })
+    it("404: responds with an error message if comment does not exist", () => {
+        const newVotes = -200
+        const voteChange = {inc_votes : newVotes}
+        return request(app)
+        .patch('/api/comments/1000000')
+        .send(voteChange)
+        .expect(404)
+        .then((response) => {
+            expect(response.body).toEqual({msg: 'No comment found for comment_id: 1000000'})
+        })
+    })
+    it("400: responds with an error message if bad urlpath used", () => {
+        const newVotes = -200
+        const voteChange = {inc_votes : newVotes}
+        return request(app)
+        .patch('/api/comments/DROP TABLES')
+        .send(voteChange)
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: 'Invalid request'})
+        })
+    })
+    it("400: responds with an error message if invalid data type used", () => {
+        const newVotes = 'BAJILLION';
+        const voteChange = {inc_votes : newVotes}
+        return request(app)
+        .patch('/api/comments/5')
+        .send(voteChange)
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg: 'Invalid request'})
+        }) 
     })
 })

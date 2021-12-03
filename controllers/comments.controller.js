@@ -25,8 +25,9 @@ exports.getComments = (req, res, next) => {
 exports.patchCommentVotesByCommentId = (req,res,next) => {
     const {comment_id} = req.params;
     const {inc_votes} = req.body;
-    changeCommentVotesByCommentId(comment_id,inc_votes)
-    .then((comment) => {
+    return Promise.all([changeCommentVotesByCommentId(comment_id,inc_votes),checkCommentExists(comment_id)])
+    // changeCommentVotesByCommentId(comment_id,inc_votes)
+    .then(([comment]) => {
         res.status(200).send({comment})
     }).catch((err) => {
         next(err)
