@@ -1,4 +1,4 @@
-const { fetchArticleById, checkArticleExists, updateArticleVotesById, fetchArticles, fetchArticlesFilterByTopic, fetchCommentsByArticleId, addCommentByArticleId, checkTopicExists } = require("../models/articles.models");
+const { fetchArticleById, checkArticleExists, updateArticleVotesById, fetchArticles, fetchArticlesFilterByTopic, fetchCommentsByArticleId, addCommentByArticleId, checkTopicExists, fetchAllArticles } = require("../models/articles.models");
 const { setDefaultIfNeeded } = require("../utils");
 
 exports.getArticleById = (req, res, next) => {
@@ -27,10 +27,12 @@ exports.patchArticleVotesById = (req,res,next) => {
 }
 
 exports.getArticles = (req,res,next) => {
-    const {order, sort_by, topic} = req.query;
-        return Promise.all([fetchArticles(order,sort_by,topic),checkTopicExists(topic)])
-        .then(([articles]) => {
-            res.status(200).send({articles})
+    const {order, sort_by, topic, limit} = req.query;
+        return Promise.all([fetchArticles(order,sort_by,topic,limit),fetchAllArticles(order,sort_by,topic),checkTopicExists(topic)])
+        .then(([articles, total_count]) => {
+            const countArticles = articles.length;
+            articles.total_count = countArticles;
+            res.status(200).send({articles: articles, total_count: total_count})
         }).catch((err) => {
             next(err);
         })

@@ -173,14 +173,15 @@ describe("PATCH /api/articles/:article_id", () => {
     })
 })
 
-describe("GET /api/articles", () => {
+describe.only("GET /api/articles", () => {
     it("200: responds with an array of article objects", () => {
         return request(app)
         .get("/api/articles")
         .expect(200)
         .then((response) => {
             expect(Array.isArray(response.body.articles)).toBe(true);
-            expect(response.body.articles).toHaveLength(12)
+            expect(response.body.articles).toHaveLength(10)
+            expect(response.body).toHaveProperty('total_count', 12)
         })
     })
     it("200: responds with an array of article objects default sorted by descending date order", () => {
@@ -238,7 +239,7 @@ describe("GET /api/articles", () => {
         .get('/api/articles?topic=paper')
         .expect(200)
         .then((response) => {
-            expect(response.body).toEqual({articles: []})
+            expect(response.body).toEqual({articles: [], total_count: 0})
             })
         })
     it('404: responds with an error message if topic does not exist', () => {
@@ -248,6 +249,32 @@ describe("GET /api/articles", () => {
             .then((response) => {
                 expect(response.body).toEqual({msg: "No topic found for topic: DROP TABLES"})
             })
+    })
+    it("200: accepts a limit query and responds with an array of articles within that limit, total count is unaffected", () => {
+        return request(app)
+        .get('/api/articles?limit=3')
+        .expect(200)
+        .then((response) => {
+            expect(response.body.articles).toHaveLength(3);
+            expect(response.body.total_count).toBe(12);
+        })
+
+    })
+    it("400: responds with an error message if invalid data type for limit query", () => {
+        return request(app)
+        .get('/api/articles?limit=35DROP D4A1TABA24SE')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid limit query'})
+        })
+    })
+    it("400: responds with an error message if client tries to set limit to 0", () => {
+        return request(app)
+        .get('/api/articles?limit=0')
+        .expect(400)
+        .then((response) => {
+            expect(response.body).toEqual({msg : 'Invalid limit query'})
+        })
     })
 })
 
@@ -604,7 +631,6 @@ describe("GET /api/users/:username", () => {
         .get('/api/users/beelzebub')
         .expect(404)
         .then((response) => {
-            console.log(response.body)
             expect(response.body).toEqual({msg: `No user found for username: beelzebub`})
         })
     })

@@ -42,25 +42,33 @@ exports.updateArticleVotesById = async (idToChangeAndVotes) => {
     }
 }
 
-exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic) => {
-    const queryStr1 = `SELECT articles.*, COUNT(comment_id) AS comment_count 
+exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limit = '10') => {
+    const regex = /^[1-9]+\d*$(?!\D)/gi;
+    const queryStr1 = `SELECT articles.*, COUNT(comment_id) AS comment_count
         FROM articles
         LEFT JOIN comments ON comments.article_id = articles.article_id `
     if(!['ASC', 'DESC'].includes(order)) {
         return Promise.reject({status:400, msg:'Invalid order query'})
     } else if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'].includes(sort_by)) {
         return Promise.reject({status:400, msg:'Invalid sort_by query'})
+    } else if (!limit.match(regex)) {
+        return Promise.reject({status:400, msg:'Invalid limit query'})
+    
     } else if(!topic) {
         
         const queryStr2 = `GROUP BY articles.article_id
-        ORDER BY ${sort_by} ${order};`
+        ORDER BY ${sort_by} ${order}
+        LIMIT ${limit};`
+        console.log(limit)
         const fullQuery = queryStr1.concat(queryStr2)
     const dbOutput = await db.query(fullQuery)
         return dbOutput.rows;
     } else {
         const queryStr2 = `WHERE topic = $1
         GROUP BY articles.article_id
-        ORDER BY ${sort_by} ${order};`
+        ORDER BY ${sort_by} ${order}
+        LIMIT ${limit};`
+        
         const fullQuery = queryStr1.concat(queryStr2)
         const dbOutput = await db.query(fullQuery, [topic])
             return dbOutput.rows;
@@ -103,4 +111,27 @@ exports.checkTopicExists = async (topic) => {
         status: 404,
         msg: `No topic found for topic: ${topic}`
     })
+}
+
+exports.fetchAllArticles = async (order = 'DESC',sort_by = 'created_at',topic) => {
+    const queryStr1 = `SELECT *
+        FROM articles `
+    if(!['ASC', 'DESC'].includes(order)) {
+        return Promise.reject({status:400, msg:'Invalid order query'})
+    } else if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'].includes(sort_by)) {
+        return Promise.reject({status:400, msg:'Invalid sort_by query'})
+    }  else if(!topic) {
+        const queryStr2 = `GROUP BY articles.article_id
+        ORDER BY ${sort_by} ${order};`
+        const fullQuery = queryStr1.concat(queryStr2)
+    const dbOutput = await db.query(fullQuery)
+        return dbOutput.rows.length;
+    } else {
+        const queryStr2 = `WHERE topic = $1
+        GROUP BY articles.article_id
+        ORDER BY ${sort_by} ${order};`
+        const fullQuery = queryStr1.concat(queryStr2)
+        const dbOutput = await db.query(fullQuery, [topic])
+            return dbOutput.rows.length;
+    }
 }
