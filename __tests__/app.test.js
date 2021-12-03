@@ -585,7 +585,7 @@ describe("GET api/users", () => {
     })
 })
 
-describe.only("GET /api/users/:username", () => {
+describe("GET /api/users/:username", () => {
     it("200: responds with a user object", () => {
         return request(app)
         .get('/api/users/butter_bridge')
@@ -606,6 +606,53 @@ describe.only("GET /api/users/:username", () => {
         .then((response) => {
             console.log(response.body)
             expect(response.body).toEqual({msg: `No user found for username: beelzebub`})
+        })
+    })
+})
+
+describe.only("PATCH /api/comments/:comment_id", () => {
+    it("200: increments comment votes by set votes", () => {
+        const newVotes = 200
+        const voteChange = {inc_votes : newVotes}
+        return request(app)
+        .patch("/api/comments/5")
+        .send(voteChange)
+        .expect(200)
+        .then((response) => {
+            expect(response.body).toEqual(
+                expect.objectContaining( {comment :
+                    {
+                    article_id: 1,
+                    comment_id: 5,
+                    body: "I hate streaming noses",
+                    votes: 200,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    created_at: "2020-11-03T00:00:00.000Z",
+                  }})
+            )
+        })
+    })
+    it("200: decrements comment votes by set votes", () => {
+        const newVotes = -200
+        const voteChange = {inc_votes : newVotes}
+        return request(app)
+        .patch("/api/comments/5")
+        .send(voteChange)
+        .expect(200)
+        .then((response) => {
+            expect(response.body).toEqual(
+                expect.objectContaining( {comment :
+                    {
+                    article_id: 1,
+                    comment_id: 5,
+                    body: "I hate streaming noses",
+                    votes: -200,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    created_at: "2020-11-03T00:00:00.000Z",
+                  }})
+            )
         })
     })
 })

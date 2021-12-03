@@ -35,3 +35,12 @@ exports.fetchComments = async () => {
     )
     return dbOutput.rows;
 }
+
+exports.changeCommentVotesByCommentId = async (comment_id, inc_votes) => {
+    const dbOutput = await db.query(`
+    UPDATE comments
+    SET votes = votes + $2
+    WHERE comment_id = $1
+    RETURNING *`, [comment_id,inc_votes])
+    return dbOutput.rows[0];
+}

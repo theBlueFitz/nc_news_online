@@ -1,5 +1,5 @@
 const { fetchCommentsByArticleId } = require("../models/articles.models");
-const { checkCommentExists, removeCommentById, fetchComments } = require("../models/comments.models");
+const { checkCommentExists, removeCommentById, fetchComments, changeCommentVotesByCommentId } = require("../models/comments.models");
 
 
 
@@ -17,6 +17,17 @@ exports.getComments = (req, res, next) => {
     fetchComments()
     .then((comments) => {
         res.status(200).send({comments})
+    }).catch((err) => {
+        next(err)
+    })
+}
+
+exports.patchCommentVotesByCommentId = (req,res,next) => {
+    const {comment_id} = req.params;
+    const {inc_votes} = req.body;
+    changeCommentVotesByCommentId(comment_id,inc_votes)
+    .then((comment) => {
+        res.status(200).send({comment})
     }).catch((err) => {
         next(err)
     })

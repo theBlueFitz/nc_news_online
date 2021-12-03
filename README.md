@@ -73,16 +73,6 @@ NOTE: Minimum required versions of Node.js = v17.1.0, Postgres = v8.7.1
 
 ### Further Routes
 
-#### **GET /api/users/:username**
-
-Responds with:
-
-- a user object which should have the following properties:
-  - `username`
-  - `avatar_url`
-  - `name`
-
----
 
 #### **PATCH /api/comments/:comment_id**
 
