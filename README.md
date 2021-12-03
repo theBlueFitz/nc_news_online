@@ -9,7 +9,7 @@ https://nc-news-sf.herokuapp.com/api
 
 This project was implemented to demonstrate my ability to flex my back end development muscles using a variety of techniques and packages.
 It is a server that includes a development and test psql database containing data that is interrelated with multiple endpoints and http request functionality.
-It makes use of express routeing and the MVC model to ensure it is RESTful, preseeding the database when tests are ran. Queriable endpoints have been sanitised to prevent SQL injection.
+It makes use of express routeing and the MVC model to ensure it is RESTful, pre-seeding the database when tests are ran. Queriable endpoints have been sanitised to prevent SQL injection.
 
 
 # Copying the repo
