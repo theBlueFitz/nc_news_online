@@ -8,8 +8,9 @@ https://nc-news-sf.herokuapp.com/api
 # Project Summary
 
 This project was implemented to demonstrate my ability to flex my back end development muscles using a variety of techniques and packages.
-It is a server that includes a database containing news articles, these articles are able to be commented on by users and voted up or down.
-### (Note to self, add more details about techniques used and functionality when not knackered and won't do it half arsed)
+It is a server that includes a development and test psql database containing data that is interrelated with multiple endpoints and http request functionality.
+It makes use of express routeing and the MVC model to ensure it is RESTful, preseeding the database when tests are ran. Queriable endpoints have been sanitised to prevent SQL injection.
+
 
 # Copying the repo
 
@@ -44,20 +45,29 @@ Resolving deltas: 100% (310/310), done.
    - [ ] jest
    - [ ] jest-sorted
    - [ ] supertest
- 
+  
+ - Seeding local db and running test
+  - The setup for the databases are already done for you, you simply need to run the script (you can see the script in yout package.json) in the following order:
+   - `npm setup-dbs`: this will create the databases
+   - `npm seed`: this will run the seed file to populate the databases
 
-### **STOP POINT: Hosting and README!**
+# NB if you want to run any testing you first need to set up your .ENV files
 
-- If you _have_ already hosted your app at this point, remember to push up to `heroku` your updated code
-- If you haven't already hosted your app, now is the time! Follow the instructions in [hosting.md](./hosting.md)
-- Write your README, including the following information:
-  - [ ] Link to hosted version
-  - [ ] Write a summary of what the project is
-  - [ ] Provide clear instructions of how to clone, install dependencies, seed local database, and run tests
-  - [ ] Include information about how to create the two `.env` files
-  - [ ] Specify minimum versions of `Node.js` and `Postgres` needed to run the project
+- Create 2 files, one called `.env.test`, the other `.env.development`,
+- In these files you need to set up your PGDATABASE and PGPASSWORD manually as per example below:
+- FOR DEVELOPMENT
+```http
+PGDATABASE = nc_news
+PGPASSWORD = <your_password>
+```
+- FOR TESTING
+ ```http
+ PGDATABASE = nc_news_test
+ PGPASSWORD = <your_password>
+ ```
+ - You should now be able to run tests by running the command `npm test`
 
-**Remember that this README is targetted at people who will come to your repo (potentially from your CV or portfolio website) and want to see what you have created, and try it out for themselves(not _just_ to look at your code!). So it is really important to include a link to the hosted version, as well as implement the above `GET /api` endpoint so that it is clear what your api does.**
+NOTE: Minimum required versions of Node.js = v17.1.0, Postgres = v8.7.1
 
 ---
 
