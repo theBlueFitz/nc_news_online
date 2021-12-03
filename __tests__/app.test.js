@@ -599,4 +599,13 @@ describe.only("GET /api/users/:username", () => {
               }})
         })
     })
+    it("404: responds with an error message if username doesn't exist", () => {
+        return request(app)
+        .get('/api/users/beelzebub')
+        .expect(404)
+        .then((response) => {
+            console.log(response.body)
+            expect(response.body).toEqual({msg: `No user found for username: beelzebub`})
+        })
+    })
 })
