@@ -173,7 +173,7 @@ describe("PATCH /api/articles/:article_id", () => {
     })
 })
 
-describe.only("GET /api/articles", () => {
+describe("GET /api/articles", () => {
     it("200: responds with an array of article objects", () => {
         return request(app)
         .get("/api/articles")
@@ -862,3 +862,7 @@ describe("PATCH /api/comments/:comment_id", () => {
         }) 
     })
 })
+
+// describe('POST /api/articles', () => {
+//     it('')
+// })
