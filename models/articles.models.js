@@ -50,7 +50,7 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
         LEFT JOIN comments ON comments.article_id = articles.article_id `
     if(!['ASC', 'DESC'].includes(order)) {
         return Promise.reject({status:400, msg:'Invalid order query'})
-    } else if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'].includes(sort_by)) {
+    } else if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'comment_count'].includes(sort_by)) {
         return Promise.reject({status:400, msg:'Invalid sort_by query'})
     } else if (!limit.match(regex)) {
         return Promise.reject({status:400, msg:'Invalid limit query'})
