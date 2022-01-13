@@ -41,6 +41,7 @@ exports.updateArticleVotesById = async (idToChangeAndVotes) => {
     return dbOutput.rows[0];
     }
 }
+// Just for change - delete after
 
 exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limit = '10', p = '0') => {
     const regex = /^[1-9]+\d*$(?!\D)/gi;
