@@ -313,7 +313,6 @@ describe("GET /api/articles", () => {
         .get('/api/articles?limit=8&p=3&order=ASC&sort_by=article_id&topic=mitch')
         .expect(200)
         .then((response) => {
-            console.log(response.body)
             expect(response.body.articles).toHaveLength(8);
             expect(response.body.total_count).toBe(11);
             expect(response.body.articles).toBeSortedBy('article_id');
@@ -865,15 +864,13 @@ describe("PATCH /api/comments/:comment_id", () => {
     })
 })
 
-// describe.only('GET /api/articles', () => {
-//     it('200: responds with an array of articles sorted by comment count', () => {
-//         return request(app)
-//         .get('/api/articles?sort_by=comment_count')
-//         .expect(200)
-//         .then((res) => {
-//             console.log(res.body.articles)
-//             console.log(typeof res.body.articles[0].comment_count)
-//             expect(res.body.articles).toBeSortedBy('comment_count', {descending:true})
-//         })
-//     })
-// })
+describe.only('GET /api/articles', () => {
+    it('200: responds with an array of articles sorted by comment count', () => {
+        return request(app)
+        .get('/api/articles?sort_by=comment_count')
+        .expect(200)
+        .then((res) => {
+            expect(res.body.articles).toBeSortedBy('comment_count', {descending:true})
+        })
+    })
+})

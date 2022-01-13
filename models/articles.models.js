@@ -65,7 +65,11 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
         LIMIT ${limit} OFFSET ${p};`
         const fullQuery = queryStr1.concat(queryStr2)
     const dbOutput = await db.query(fullQuery)
-        return dbOutput.rows;
+    const numbered = dbOutput.rows.map((article) => {
+        article.comment_count = Number(article.comment_count)
+        return article;
+    })
+        return numbered;
     } else {
         const queryStr2 = `WHERE topic = $1
         GROUP BY articles.article_id
