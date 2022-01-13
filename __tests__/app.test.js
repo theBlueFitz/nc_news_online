@@ -308,11 +308,12 @@ describe("GET /api/articles", () => {
             expect(response.body).toEqual({msg : 'Invalid page query'})
         })
     })
-    it("200: responds with an array of articles when all possible queries set", () => {
+    it.only("200: responds with an array of articles when all possible queries set", () => {
         return request(app)
         .get('/api/articles?limit=8&p=3&order=ASC&sort_by=article_id&topic=mitch')
         .expect(200)
         .then((response) => {
+            console.log(response.body)
             expect(response.body.articles).toHaveLength(8);
             expect(response.body.total_count).toBe(11);
             expect(response.body.articles).toBeSortedBy('article_id');
@@ -324,7 +325,8 @@ describe("GET /api/articles", () => {
                     author: 'rogersop',
                     body: 'We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages',
                     created_at:  "2020-05-05T23:00:00.000Z",
-                    votes: 0
+                    votes: 0,
+                    comment_count: 0
                   })
             )
         })
@@ -863,6 +865,15 @@ describe("PATCH /api/comments/:comment_id", () => {
     })
 })
 
-// describe('POST /api/articles', () => {
-//     it('')
+// describe.only('GET /api/articles', () => {
+//     it('200: responds with an array of articles sorted by comment count', () => {
+//         return request(app)
+//         .get('/api/articles?sort_by=comment_count')
+//         .expect(200)
+//         .then((res) => {
+//             console.log(res.body.articles)
+//             console.log(typeof res.body.articles[0].comment_count)
+//             expect(res.body.articles).toBeSortedBy('comment_count', {descending:true})
+//         })
+//     })
 // })

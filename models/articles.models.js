@@ -51,7 +51,7 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
         LEFT JOIN comments ON comments.article_id = articles.article_id `
     if(!['ASC', 'DESC'].includes(order)) {
         return Promise.reject({status:400, msg:'Invalid order query'})
-    } else if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'comment_count'].includes(sort_by)) {
+    } else if (!['comment_count','article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'].includes(sort_by)) {
         return Promise.reject({status:400, msg:'Invalid sort_by query'})
     } else if (!limit.match(regex)) {
         return Promise.reject({status:400, msg:'Invalid limit query'})
@@ -74,7 +74,11 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
         
         const fullQuery = queryStr1.concat(queryStr2)
         const dbOutput = await db.query(fullQuery, [topic])
-            return dbOutput.rows;
+        const numbered = dbOutput.rows.map((article) => {
+            article.comment_count = Number(article.comment_count)
+            return article;
+        })
+            return numbered;
     }
 }
 
@@ -125,25 +129,13 @@ exports.checkTopicExists = async (topic) => {
     })
 }
 
-exports.fetchAllArticles = async (order = 'DESC',sort_by = 'created_at',topic) => {
-    const queryStr1 = `SELECT *
-        FROM articles `
-    if(!['ASC', 'DESC'].includes(order)) {
-        return Promise.reject({status:400, msg:'Invalid order query'})
-    } else if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'].includes(sort_by)) {
-        return Promise.reject({status:400, msg:'Invalid sort_by query'})
-    }  else if(!topic) {
-        const queryStr2 = `GROUP BY articles.article_id
-        ORDER BY ${sort_by} ${order};`
-        const fullQuery = queryStr1.concat(queryStr2)
-    const dbOutput = await db.query(fullQuery)
-        return dbOutput.rows.length;
-    } else {
-        const queryStr2 = `WHERE topic = $1
-        GROUP BY articles.article_id
-        ORDER BY ${sort_by} ${order};`
-        const fullQuery = queryStr1.concat(queryStr2)
-        const dbOutput = await db.query(fullQuery, [topic])
-            return dbOutput.rows.length;
+exports.fetchAllArticles = async (topic) => {
+    let queryStr = `SELECT * FROM articles`
+    const queryParams = []
+    if (topic) {
+    queryParams.push(topic);
+    queryStr += ` WHERE topic = $1`
     }
-}
+    const dbOutput = await db.query(queryStr, queryParams)
+    return dbOutput.rows.length;
+    }

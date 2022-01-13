@@ -28,10 +28,11 @@ exports.patchArticleVotesById = (req,res,next) => {
 
 exports.getArticles = (req,res,next) => {
     const {order, sort_by, topic, limit, p} = req.query;
-        return Promise.all([fetchArticles(order,sort_by,topic,limit,p),fetchAllArticles(order,sort_by,topic),checkTopicExists(topic)])
+        return Promise.all([fetchArticles(order,sort_by,topic,limit,p),fetchAllArticles(topic),checkTopicExists(topic)])
         .then(([articles, total_count]) => {
             res.status(200).send({articles: articles, total_count: total_count})
         }).catch((err) => {
+            console.log(err)
             next(err);
         })
 }
