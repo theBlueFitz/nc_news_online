@@ -32,7 +32,6 @@ exports.getArticles = (req,res,next) => {
         .then(([articles, total_count]) => {
             res.status(200).send({articles: articles, total_count: total_count})
         }).catch((err) => {
-            console.log(err)
             next(err);
         })
 }

@@ -44,6 +44,12 @@ exports.updateArticleVotesById = async (idToChangeAndVotes) => {
 // Just for change - delete after
 
 exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limit = '10', p = '0') => {
+    let start = 0;
+    if (p === 1) {
+        start = limit + p;
+    } else if (p > 1) {
+        start = (limit * p) + 1;
+    }
     const regex = /^[1-9]+\d*$(?!\D)/gi;
     const regex2 = /^\d+$(?!\D)/gi;
     const queryStr1 = `SELECT articles.*, COUNT(comment_id) AS comment_count
@@ -62,7 +68,7 @@ exports.fetchArticles = async (order = 'DESC',sort_by = 'created_at', topic,limi
         
         const queryStr2 = `GROUP BY articles.article_id
         ORDER BY ${sort_by} ${order}
-        LIMIT ${limit} OFFSET ${p};`
+        LIMIT ${limit} OFFSET ${start};`
         const fullQuery = queryStr1.concat(queryStr2)
     const dbOutput = await db.query(fullQuery)
     const numbered = dbOutput.rows.map((article) => {
